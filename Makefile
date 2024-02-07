@@ -3,6 +3,10 @@ BIN := bin
 GOOS ?= $(shell uname | tr A-Z a-z)
 GOLANGCI_LINT_VERSION = v1.53.3
 PROJECT := package-feeds
+VERSION ?= $(shell echo $$VERSION)
+ifeq ($(VERSION),)
+VERSION := $(shell git rev-parse --short HEAD)
+endif
 
 .PHONY: help
 help:  ## Display this help
@@ -25,6 +29,14 @@ help:  ## Display this help
 build:
 	mkdir -p $(BIN)/$(PROJECT) && \
 	env CGO_ENABLED=0 GOOS=$(GOOS) go build -o $(BIN)/$(PROJECT) -a ./...
+
+.PHONY: build_image
+build_image: ## Build the docker image
+	docker buildx build --platform linux/amd64,linux/arm64 -t $(DOCKER_REPO)/$(PROJECT):$(VERSION) . --load
+
+.PHONY: push_image
+push_image: build_image ## Push the docker image
+	docker buildx build --platform linux/amd64,linux/arm64 -t $(DOCKER_REPO)/$(PROJECT):$(VERSION) . --push
 
 .PHONY: clean
 clean: ## Clean the build directory
