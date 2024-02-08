@@ -156,7 +156,12 @@ func (pc PublisherConfig) ToPublisher(ctx context.Context) (publisher.Publisher,
 	case stdout.PublisherType:
 		return stdout.New(), nil
 	case "http-client": // Check for the new publisher type
-		return httpclientpubsub.New(pc.HTTPClientConfig)
+		var httpClientConfig httpclientpubsub.Config
+		err = strictDecode(pc.Config, &httpClientConfig)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode httpclient config: %w", err)
+		}
+		return httpclientpubsub.FromConfig(ctx, httpClientConfig)
 	default:
 		return nil, fmt.Errorf("%w : %v", errUnknownPub, pc.Type)
 	}

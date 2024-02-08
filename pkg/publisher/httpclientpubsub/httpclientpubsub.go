@@ -11,28 +11,31 @@ import (
 
 const PublisherType = "http-client"
 
-type HTTPClientPubSub struct {
-	url string
-}
-
 type Config struct {
 	URL string `mapstructure:"url"`
 }
 
-func New(config Config) (*HTTPClientPubSub, error) {
-	return &HTTPClientPubSub{
-		url: config.URL,
-	}, nil
+type HTTPClientPubSub struct{
+	url string
+}
+
+func New(ctx context.Context, url string) (*HTTPClientPubSub, error) {
+	pub := &HTTPClientPubSub{url: url}
+	return pub, nil
 }
 
 func (pub *HTTPClientPubSub) Name() string {
 	return PublisherType
 }
 
+func FromConfig(ctx context.Context, config Config) (*HTTPClientPubSub, error) {
+	return New(ctx, config.URL)
+}
+
 func (pub *HTTPClientPubSub) Send(ctx context.Context, body []byte) error {
 	log.Info("Sending event to HTTP client publisher")
 	// Print the url to the log so that we can see where the event is being sent.
-	req, err := http.NewRequest("POST", "http://127.0.0.1:8081/events", bytes.NewReader(body))
+	req, err := http.NewRequest("POST", pub.url, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
