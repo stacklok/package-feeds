@@ -3,6 +3,7 @@ package httpclientpubsub
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -10,6 +11,8 @@ import (
 )
 
 const PublisherType = "http-client"
+
+var ErrHTTPRequestFailed = errors.New("HTTP request failed")
 
 type Config struct {
 	URL string `mapstructure:"url"`
@@ -50,7 +53,7 @@ func (pub *HTTPClientPubSub) Send(ctx context.Context, body []byte) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("HTTP request failed with status code: %d", resp.StatusCode)
+		return fmt.Errorf("%w with status code: %d", ErrHTTPRequestFailed, resp.StatusCode)
 	}
 
 	return nil
