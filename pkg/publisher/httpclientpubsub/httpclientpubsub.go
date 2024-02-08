@@ -15,7 +15,7 @@ type Config struct {
 	URL string `mapstructure:"url"`
 }
 
-type HTTPClientPubSub struct{
+type HTTPClientPubSub struct {
 	url string
 }
 

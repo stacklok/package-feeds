@@ -3,7 +3,6 @@ package config
 import (
 	"github.com/ossf/package-feeds/pkg/events"
 	"github.com/ossf/package-feeds/pkg/feeds"
-
 	"github.com/ossf/package-feeds/pkg/publisher/httpclientpubsub"
 )
 
