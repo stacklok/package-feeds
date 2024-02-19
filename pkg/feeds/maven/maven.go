@@ -33,7 +33,7 @@ func New(feedOptions feeds.FeedOptions) (*Feed, error) {
 	}, nil
 }
 
-// Package represents package information
+// Package represents package information.
 type LatestVersionInfo struct {
 	Version             string `json:"version"`
 	TimestampUnixWithMS int64  `json:"timestampUnixWithMS"`
@@ -45,12 +45,12 @@ type Package struct {
 	LatestVersionInfo LatestVersionInfo `json:"latestVersionInfo"`
 }
 
-// Response represents the response structure from Sonatype API
+// Response represents the response structure from Sonatype API.
 type Response struct {
 	Components []Package `json:"components"`
 }
 
-// fetchPackages fetches packages from Sonatype API for the given page
+// fetchPackages fetches packages from Sonatype API for the given page.
 func (feed Feed) fetchPackages(page int) ([]Package, error) {
 	// Define the request payload
 	payload := map[string]interface{}{
@@ -62,21 +62,21 @@ func (feed Feed) fetchPackages(page int) ([]Package, error) {
 
 	jsonPayload, err := json.Marshal(payload)
 	if err != nil {
-		return nil, fmt.Errorf("error encoding JSON: %v", err)
+		return nil, fmt.Errorf("error encoding JSON: %w", err)
 	}
 
-	// Send POST request to Sonatype API
+	// Send POST request to Sonatype API.
 	resp, err := http.Post(feed.baseURL+"?repository=maven-central", "application/json", bytes.NewBuffer(jsonPayload))
 	if err != nil {
-		return nil, fmt.Errorf("error sending request: %v", err)
+		return nil, fmt.Errorf("error sending request: %w", err)
 	}
 	defer resp.Body.Close()
 
-	// Decode response
+	// Decode response.
 	var response Response
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {
-		return nil, fmt.Errorf("error decoding response: %v", err)
+		return nil, fmt.Errorf("error decoding response: %w", err)
 	}
 	return response.Components, nil
 }
@@ -87,7 +87,7 @@ func (feed Feed) Latest(cutoff time.Time) ([]*feeds.Package, time.Time, []error)
 
 	page := 0
 	for {
-		// Fetch packages from Sonatype API for the current page
+		// Fetch packages from Sonatype API for the current page.
 		packages, err := feed.fetchPackages(page)
 		if err != nil {
 			errs = append(errs, err)

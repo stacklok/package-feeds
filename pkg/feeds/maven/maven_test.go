@@ -47,7 +47,6 @@ func TestMavenLatest(t *testing.T) {
 			t.Errorf("Feed type not set correctly in goproxy package following Latest()")
 		}
 	}
-
 }
 
 func TestMavenNotFound(t *testing.T) {
