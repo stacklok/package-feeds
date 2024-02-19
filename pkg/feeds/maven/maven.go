@@ -72,6 +72,12 @@ func (feed Feed) fetchPackages(page int) ([]Package, error) {
 	}
 	defer resp.Body.Close()
 
+	// Handle rate limiting (HTTP status code 429).
+	if resp.StatusCode == http.StatusTooManyRequests {
+		time.Sleep(5 * time.Second)
+		return feed.fetchPackages(page) // Retry the request
+	}
+
 	// Decode response.
 	var response Response
 	err = json.NewDecoder(resp.Body).Decode(&response)
